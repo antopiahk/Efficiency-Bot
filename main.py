@@ -27,10 +27,10 @@ def member_joined_office(member):
 
 async def member_left_office(member):
     session_duration = calculate_duration(member, users_sessions[member.name])
-    display_text = member.display_name + " Logged Out with a Duration of " + str(session_duration) + " Minutes"
+    display_text = member.name + " Logged Out with a Duration of " + str(session_duration) + " Minutes"
     logging_channel = client.get_channel(1136091862839595018)
     await logging_channel.send(display_text)
-    log = member.display_name + " " +  str(session_duration) +  "\n"
+    log = member.name + " " +  str(session_duration) +  "\n"
     with open("efficiency-bot/Efficiency-bot/time_logs.txt", "a") as time_logs:
         time_logs.write(log)
 
@@ -53,7 +53,8 @@ async def on_ready():
 
 @client.command()
 async def weekly_log(ctx):
-    await ctx.send(ctx.author + " Accumulated a Total of " + weekly_hours(ctx.author) + " Hours this Week.")
+    display_text = str(ctx.author.name) + " Accumulated a Total of " + str(weekly_hours(ctx.author)) + " Hours this Week."
+    await ctx.send(display_text)
 
 @client.event
 async def on_voice_state_update(member, before, after):

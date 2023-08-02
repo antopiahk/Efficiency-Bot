@@ -10,4 +10,4 @@ def calculate_duration(member, start_time):
 def seconds_to_minutes(seconds):
     return round(seconds / 60)
 def minutes_to_hours(seconds):
-    return round(minutes_to_hours / 60, 3)
+    return round(seconds_to_minutes(seconds) / 60, 3)
