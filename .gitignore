@@ -153,4 +153,4 @@ cython_debug/
 
 # Private Stuff
 not_public.txt
-time_log.txt
+time_logs.txt
