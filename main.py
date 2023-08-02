@@ -14,7 +14,7 @@ client = commands.Bot(command_prefix='$', intents=intents)
 
 # Token Handling
 TOKEN: str = ''
-with open('efficiency-bot/Efficiency-bot/not_public.txt', 'r') as tokenFile:
+with open('efficiency-bot/not_public.txt', 'r') as tokenFile:
     TOKEN = tokenFile.read()
 
 
@@ -48,7 +48,7 @@ def weekly_hours(member):
     minutes_sum = 0
     today = datetime.date.today()
     previous_monday = today - datetime.timedelta(days=today.weekday())
-    with open("efficiency-bot/Efficiency-bot/time_logs.txt", "r") as time_logs:
+    with open("efficiency-bot/time_logs.txt", "r") as time_logs:
         for line in time_logs:
             if line.split(" ")[2] == member.name:
                 if datetime.datetime.strptime(line.split(" ")[0], "%d/%m/%Y").date() >= previous_monday:
@@ -61,7 +61,7 @@ def write_to_log(name, duration):
     now = now.strftime("%d/%m/%Y %H:%M")
     
     log = now + " " + name + " " +  str(duration) +  "\n"
-    with open("efficiency-bot/Efficiency-bot/time_logs.txt", "a") as time_logs:
+    with open("efficiency-bot-bot/time_logs.txt", "a") as time_logs:
         time_logs.write(log)
 
 # Discord Functions
