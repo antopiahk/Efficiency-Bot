@@ -1,6 +1,7 @@
 import asyncio
 import discord
 import time
+import datetime
 from discord.ext import commands
 
 from utils import calculate_duration, minutes_to_hours
@@ -37,23 +38,31 @@ async def member_left_office(member):
     # Send Session Report
     await logging_channel.send(display_text)
 
-    # Log to file
-    log = member.name + " " +  str(session_duration) +  "\n"
-    with open("efficiency-bot/Efficiency-bot/time_logs.txt", "a") as time_logs:
-        time_logs.write(log)
+    # Log it file
+    write_to_log(member.name, session_duration)
 
 def start_clock_for_member(member):
     users_sessions[member.name] = time.time()
 
 def weekly_hours(member):
     minutes_sum = 0
+    today = datetime.date.today()
+    previous_monday = today - datetime.timedelta(days=today.weekday())
     with open("efficiency-bot/Efficiency-bot/time_logs.txt", "r") as time_logs:
         for line in time_logs:
-            if line.split(" ")[0] == member.name:
-                minutes_sum += float(line.split(" ")[1])
+            if line.split(" ")[2] == member.name:
+                if datetime.datetime.strptime(line.split(" ")[0], "%d/%m/%Y").date() >= previous_monday:
+                    print(minutes_sum)
+                    minutes_sum += float(line.split(" ")[3])
     return minutes_to_hours(minutes_sum)
 
-
+def write_to_log(name, duration):
+    now = datetime.datetime.now()
+    now = now.strftime("%d/%m/%Y %H:%M")
+    
+    log = now + " " + name + " " +  str(duration) +  "\n"
+    with open("efficiency-bot/Efficiency-bot/time_logs.txt", "a") as time_logs:
+        time_logs.write(log)
 
 # Discord Functions
 
@@ -68,6 +77,18 @@ async def weekly_log(ctx, member: discord.Member = None):
     display_text = str(member.display_name) + " Accumulated a Total of " + str(weekly_hours(member)) + " Hours this Week."
     await ctx.send(display_text)
 
+@client.command()
+async def daily_log(ctx, member: discord.Member = None):
+    if (member == None):
+        member = ctx.author
+    display_text = str(member.display_name) + " Accumulated a Total of " + str(weekly_hours(member)) + " Hours this Week."
+    await ctx.send(display_text)
+
+@client.command()
+async def manual_log(ctx, duration: float):
+    write_to_log(ctx.author.name, duration)
+    display_text = "Try not to forget next time... \n Added " + str(minutes_to_hours(duration)) + " Hours to " + str(ctx.author.display_name) + "'s clock."
+    await ctx.send(display_text)
 
 @client.event
 async def on_voice_state_update(member, before, after):
