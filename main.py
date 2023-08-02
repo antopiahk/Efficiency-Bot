@@ -5,32 +5,37 @@ TOKEN: str = ''
 with open('efficiency-bot/Efficiency-Bot/not_public.txt', 'r') as tokenFile:
     TOKEN = tokenFile.read()
 
-print(TOKEN)
-
 intents = discord.Intents.all()
 intents.message_content = True
 
-client = discord.Client(intents=intents)
+bot = discord.Client(intents=intents)
 
-@client.event
+@bot.event
 async def on_ready():
-    print(f'We have logged in as {client.user}')
+    print(f'We have logged in as {bot.user}')
 
-@client.event
+@bot.event
 async def on_message(message):
-    if message.author == client.user:
+    if message.author == bot.user:
         return
 
     if message.content.startswith('$hello'):
         await message.channel.send('Im watching...')
 
-@client.event
+@bot.event
 async def on_voice_state_update(member, before, after):
-    if before.channel is None and after.channel is not None: 
-       time_log.write()
+    print("Voice State Change")
+    if before.channel is None and after.channel is not None:
+       text_to_write = member.display_name + " Logged In @ " + str(time.time())
+       print(text_to_write)
+       with open("efficiency-bot/Efficiency-Bot/time_log.txt", "w") as time_log:
+            time_log.write(text_to_write)
     if before.channel is not None and after.channel is None:
-          print(member, " signed out of work!")
+        text_to_write = member.display_name + " Logged Out @ " + str(time.time())
+        print(text_to_write)
+        with open("efficiency-bot/Efficiency-Bot/time_log.txt", "w") as time_log:
+            time_log.write(text_to_write)
 
 
 
-client.run(TOKEN)
+bot.run(TOKEN)
