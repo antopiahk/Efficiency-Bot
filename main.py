@@ -8,9 +8,9 @@ from utils import calculate_duration, minutes_to_hours
 # Discord Stuff
 intents = discord.Intents.all()
 intents.message_content = True
-
 client = discord.Client(intents=intents)
 client = commands.Bot(command_prefix='$', intents=intents)
+
 # Token Handling
 TOKEN: str = ''
 with open('efficiency-bot/Efficiency-bot/not_public.txt', 'r') as tokenFile:
@@ -20,16 +20,19 @@ with open('efficiency-bot/Efficiency-bot/not_public.txt', 'r') as tokenFile:
 # Logging & Calculating {'member.name': session_start_time}
 users_sessions = {'horheyjorge': 0, 'eksno': 0, 'herecomessebastianvettel': 0}
 
-logging_channel = None
-
 def member_joined_office(member):
     start_clock_for_member(member)
 
 async def member_left_office(member):
+    # Variables
     session_duration = calculate_duration(member, users_sessions[member.name])
+    logging_channel = discord.utils.get(client.get_all_channels(), name="hour-logging")
     display_text = member.name + " Logged Out with a Duration of " + str(session_duration) + " Minutes"
-    logging_channel = client.get_channel(1136091862839595018)
+
+    # Send Session Report
     await logging_channel.send(display_text)
+
+    # Log to file
     log = member.name + " " +  str(session_duration) +  "\n"
     with open("efficiency-bot/Efficiency-bot/time_logs.txt", "a") as time_logs:
         time_logs.write(log)
@@ -46,11 +49,12 @@ def weekly_hours(member):
 
     return minutes_to_hours(minutes_sum)
 
+# Discord Functions
 
 @client.event
 async def on_ready():
     print(f'We have logged in as {client.user}')
-
+    
 @client.command()
 async def weekly_log(ctx):
     display_text = str(ctx.author.name) + " Accumulated a Total of " + str(weekly_hours(ctx.author)) + " Hours this Week."
